@@ -48,12 +48,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const handleTaskEdit = async (data: TaskCreateUpdate) => {
     if (!task) return;
 
+    const dueDate = new Date(data.due_date);
     const utcDate = new Date(
-      Date.UTC(
-        data.due_date.getFullYear(),
-        data.due_date.getMonth(),
-        data.due_date.getDate()
-      )
+      Date.UTC(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())
     );
 
     data.due_date = utcDate;
