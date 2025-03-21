@@ -98,12 +98,14 @@ export default function Page() {
             className="bg-background text-muted-foreground  hover:text-primary hover:bg-primary/20 cursor-pointer"
           >
             {!showOnlyIncomplete ? <Eye /> : <EyeOff />}
-            {!showOnlyIncomplete ? "Hide" : "Show"} Completed
+            <p className="hidden sm:block">
+              {!showOnlyIncomplete ? "Hide" : "Show"} Completed
+            </p>
           </Button>
           <CreateTask onTaskCreated={fetchTasks}>
             <Button className="bg-primary text-white">
               <Plus />
-              New Task
+              <p className="hidden md:block">New Task</p>
             </Button>
           </CreateTask>
         </div>

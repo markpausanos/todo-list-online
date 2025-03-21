@@ -36,7 +36,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               onPressedChange={() => setShowOnlyToday(!showOnlyToday)}
             >
               <SquareCheckBig />
-              <p>Tasks</p>
+              <p className="hidden md:block">Tasks</p>
             </Toggle>
             <Toggle
               pressed={showOnlyToday}
@@ -44,7 +44,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               onPressedChange={() => setShowOnlyToday(!showOnlyToday)}
             >
               <CalendarCheck />
-              <p>Today</p>
+              <p className="hidden md:block">Today</p>
             </Toggle>
             <Button
               disabled={isLoading}
