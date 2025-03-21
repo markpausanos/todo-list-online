@@ -81,8 +81,17 @@ export default function Page() {
 
   return (
     <>
-      <div className="flex w-full flex-row justify-between">
-        <h1 className="text-2xl font-bold">All Tasks</h1>
+      <div className="flex w-full flex-row items-center justify-between">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-bold">
+            {showOnlyToday && "Today"}
+            {!showOnlyToday && "Tasks"}
+          </h1>
+          {showOnlyToday && (
+            <p className="text-muted-foreground text-sm">All tasks due today</p>
+          )}
+        </div>
+
         <div className="flex flex-row gap-4">
           <Button
             onClick={() => setShowOnlyIncomplete(!showOnlyIncomplete)}
