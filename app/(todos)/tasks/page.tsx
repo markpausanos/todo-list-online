@@ -98,7 +98,7 @@ export default function Page() {
             className="bg-background text-muted-foreground  hover:text-primary hover:bg-primary/20 cursor-pointer"
           >
             {!showOnlyIncomplete ? <Eye /> : <EyeOff />}
-            <p className="hidden sm:block">
+            <p className="hidden md:block">
               {!showOnlyIncomplete ? "Hide" : "Show"} Completed
             </p>
           </Button>
