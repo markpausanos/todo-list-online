@@ -42,11 +42,9 @@ export function SignUpForm({
     },
   });
 
-  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
-    setError(null);
     setIsLoading(true);
 
     try {
@@ -54,9 +52,8 @@ export function SignUpForm({
       toast.success("Email sent to verify your account");
 
       router.push("/login");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-      toast.error(error);
+    } catch {
+      toast.error("Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);
     }

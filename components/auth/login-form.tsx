@@ -44,7 +44,7 @@ export function LoginForm({
     try {
       await login(data);
       router.push("/tasks");
-    } catch {
+    } catch  {
       toast.error("Invalid email or password. Please try again.");
     } finally {
       setIsLoading(false);
