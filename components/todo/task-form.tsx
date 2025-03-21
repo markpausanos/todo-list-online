@@ -67,7 +67,7 @@ export default function TaskForm({
             name="completed"
             control={control}
             render={({ field }) => (
-              <div className="flex flex-row items-center space-x-2">
+              <div className="flex flex-col items-center space-x-2 md:flex-row">
                 <Checkbox
                   id="completed"
                   checked={field.value}
