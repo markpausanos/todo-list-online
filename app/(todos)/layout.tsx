@@ -1,5 +1,63 @@
-import AuthProvider from '@/components/providers/auth-provider';
+"use client";
+
+import { logout } from "@/actions/users";
+import AuthProvider from "@/components/providers/auth-provider";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Toggle } from "@/components/ui/toggle";
+import { useTaskStore } from "@/stores/task-store";
+
+import { CalendarCheck, LogOut, SquareCheckBig } from "lucide-react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-	return <AuthProvider>{children}</AuthProvider>;
+  const { showOnlyToday, setShowOnlyToday } = useTaskStore();
+
+  const handleSignOut = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <AuthProvider>
+      <div className="min-h-svh flex w-full flex-col items-center">
+        <div className="flex w-full items-center justify-between px-6 py-4 md:px-20 lg:px-44">
+          <h1 className="font-bold">Essence</h1>
+          <div className="flex flex-row items-center gap-4">
+            <Toggle
+              pressed={!showOnlyToday}
+              className="text-muted-foreground data-[state=on]:bg-primary/20 data-[state=on]:text-primary"
+              onPressedChange={() => setShowOnlyToday(!showOnlyToday)}
+            >
+              <SquareCheckBig />
+              <p>Tasks</p>
+            </Toggle>
+            <Toggle
+              pressed={showOnlyToday}
+              className="text-muted-foreground data-[state=on]:bg-primary/20 data-[state=on]:text-primary"
+              onPressedChange={() => setShowOnlyToday(!showOnlyToday)}
+            >
+              <CalendarCheck />
+              <p>Today</p>
+            </Toggle>
+            <Button
+              onClick={handleSignOut}
+              className="bg-background text-muted-foreground hover:text-destructive hover:bg-destructive/20 cursor-pointer shadow-none"
+            >
+              <LogOut />
+
+              <p className="hidden md:block">Sign Out</p>
+            </Button>
+          </div>
+        </div>
+        <Separator className="mb-10" />
+
+        <div className="flex w-full max-w-3xl flex-col items-center justify-center px-10">
+          {children}
+        </div>
+      </div>
+    </AuthProvider>
+  );
 }

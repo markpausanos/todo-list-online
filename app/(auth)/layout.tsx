@@ -1,7 +1,7 @@
 interface AuthLayoutProps {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export default function AuthLayout({ children }: AuthLayoutProps) {
-	return <main className="h-screen w-screen bg-background">{children}</main>;
+export default async function AuthLayout({ children }: AuthLayoutProps) {
+  return <main className="bg-background h-screen w-screen">{children}</main>;
 }

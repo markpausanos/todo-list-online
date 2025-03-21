@@ -4,13 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +14,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { BeatLoader } from "react-spinners";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -41,22 +36,18 @@ export function LoginForm({
     },
   });
 
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onSubmit = async (data: z.infer<typeof loginSchema>) => {
-    setError(null);
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       await login(data);
-
-      router.push("/home");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      router.push("/tasks");
+    } catch {
       toast.error("Invalid email or password. Please try again.");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -110,8 +101,9 @@ export function LoginForm({
           />
 
           {/* Submit Button */}
-          <Button disabled={loading} type="submit" className="w-full">
-            Login
+          <Button disabled={isLoading} type="submit" className="w-full">
+            {!isLoading && <p>Login</p>}
+            {isLoading && <BeatLoader size={8} color="white" />}
           </Button>
         </form>
       </Form>

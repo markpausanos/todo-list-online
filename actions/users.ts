@@ -2,7 +2,6 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { UserLoginSignup } from '@/types/user';
-import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function login(user: UserLoginSignup) {
@@ -20,21 +19,16 @@ export async function login(user: UserLoginSignup) {
 export async function signup(user: UserLoginSignup) {
 	const supabase = await createClient();
 	console.log('user', user);
-	const { data, error } = await supabase.auth.signUp({
+	const { error } = await supabase.auth.signUp({
 		email: user.email,
 		password: user.password,
 	});
 
-	console.log('Response:', data); // ✅ Log response
-	console.log('Error:', error); // ✅ Log error
-
 	if (error) {
-		redirect('/error');
+		throw new Error(error.message);
 	}
-
-	revalidatePath('/', 'layout');
-	redirect('/');
 }
+
 
 export async function getUser() {
 	const supabase = await createClient();
