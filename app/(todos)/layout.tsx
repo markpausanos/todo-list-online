@@ -8,13 +8,17 @@ import { Toggle } from "@/components/ui/toggle";
 import { useTaskStore } from "@/stores/task-store";
 
 import { CalendarCheck, LogOut, SquareCheckBig } from "lucide-react";
+import { useState } from "react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { showOnlyToday, setShowOnlyToday } = useTaskStore();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSignOut = async () => {
     try {
+      setIsLoading(true);
       await logout();
+      setIsLoading(false);
     } catch (error) {
       console.error(error);
     }
@@ -43,6 +47,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <p>Today</p>
             </Toggle>
             <Button
+              disabled={isLoading}
               onClick={handleSignOut}
               className="bg-background text-muted-foreground hover:text-destructive hover:bg-destructive/20 cursor-pointer shadow-none"
             >
