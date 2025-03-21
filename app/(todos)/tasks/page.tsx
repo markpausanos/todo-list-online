@@ -124,7 +124,7 @@ export default function Page() {
           </div>
         )}
         <AnimatePresence>
-          <div className="flex w-full flex-col gap-4">
+          <div className="flex w-full flex-col gap-4 pb-10">
             {!isLoading &&
               filteredTasks.map((task) => (
                 <TaskCard
