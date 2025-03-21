@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ClipLoader } from "react-spinners";
 
-export default function Page({ params }: { params: { id: string } }) {
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [task, setTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(false);

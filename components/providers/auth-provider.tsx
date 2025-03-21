@@ -34,7 +34,7 @@ export default function AuthProvider({
   if (loading)
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center">
-        <BeatLoader className="text-" />
+        <BeatLoader />
       </div>
     );
 
