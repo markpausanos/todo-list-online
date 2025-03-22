@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const useDeleteTask = () => {
   const queryClient = useQueryClient();
-  const { setTasks } = useTaskStore();
+  const { tasks, setTasks } = useTaskStore();
 
   return useMutation({
     mutationFn: async (id: number) => await deleteTask(id),
@@ -13,11 +13,13 @@ const useDeleteTask = () => {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ["tasks"] });
 
-      queryClient.setQueryData<Task[]>(["tasks"], (oldTasks = []) => {
-        const updatedTasks = oldTasks.filter((t) => t.id !== id);
-        setTasks(updatedTasks);
-        return updatedTasks;
-      });
+      const updatedTasks = (tasks as Task[]).filter((t) => t.id !== id);
+
+      setTasks(updatedTasks);
+
+      queryClient.setQueryData<Task[]>(["tasks"], (oldTasks: Task[] = []) =>
+        oldTasks.filter((t) => t.id !== id)
+      );
 
       return { previousTasks: queryClient.getQueryData<Task[]>(["tasks"]) };
     },
@@ -25,7 +27,7 @@ const useDeleteTask = () => {
     onError: (_, __, context) => {
       if (context?.previousTasks) {
         queryClient.setQueryData(["tasks"], context.previousTasks);
-        setTasks(context.previousTasks); // Restore UI on error
+        setTasks(context.previousTasks);
       }
     },
 
