@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateTask } from "@/actions/todos";
 import { TaskCreateUpdate, Task } from "../../types/task";
-import { toast } from "sonner";
+import { useTaskStore } from "@/stores/task-store";
 
 const useUpdateTask = () => {
   const queryClient = useQueryClient();
+  const { setTasks } = useTaskStore();
 
   return useMutation({
     mutationFn: async ({
@@ -24,7 +25,13 @@ const useUpdateTask = () => {
     }) => {
       await queryClient.cancelQueries({ queryKey: ["tasks"] });
 
-      const previousTasks = queryClient.getQueryData(["tasks"]);
+      const previousTasks = queryClient.getQueryData<Task[]>(["tasks"]);
+
+      const updatedTasks = (previousTasks as Task[]).map((t) =>
+        t.id === taskId ? { ...t, ...task } : t
+      );
+
+      setTasks(updatedTasks);
 
       queryClient.setQueryData(["tasks"], (oldTasks: Task[] = []) =>
         oldTasks.map((t) =>
@@ -35,12 +42,11 @@ const useUpdateTask = () => {
       return { previousTasks };
     },
 
-    onError: (error, __, context) => {
+    onError: (_, __, context) => {
       if (context?.previousTasks) {
         queryClient.setQueryData(["tasks"], context.previousTasks);
+        setTasks(context.previousTasks);
       }
-
-      toast.error(error.message);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
