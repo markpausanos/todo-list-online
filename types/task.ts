@@ -4,7 +4,6 @@ export type Task = {
   description?: string;
   due_date: Date;
   completed: boolean;
-  userId: string;
 };
 
-export type TaskCreateUpdate = Omit<Task, "id" | "userId">;
+export type TaskCreateUpdate = Omit<Task, "id">;

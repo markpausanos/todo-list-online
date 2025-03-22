@@ -2,84 +2,89 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TaskCreateUpdate, Task } from "@/types/task";
+import { TaskCreateUpdate } from "@/types/task";
 import { MoveLeft, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import TaskForm from "@/components/todo/task-form";
 import { toast } from "sonner";
-import { updateTask, deleteTask, getTask } from "@/actions/todos";
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ClipLoader } from "react-spinners";
+import { useDeleteTask, useTask, useUpdateTask } from "@/hooks";
+import { use, useEffect } from "react";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const [task, setTask] = useState<Task | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const { id } = use(params);
+  const { data: task, isLoading } = useTask(Number(id));
+  const updateTask = useUpdateTask();
+  const deleteTask = useDeleteTask();
+
+  console.log(task);
 
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<TaskCreateUpdate>();
+  } = useForm<TaskCreateUpdate>({
+    defaultValues: {
+      title: "",
+      description: "",
+      due_date: undefined,
+      completed: false,
+    },
+  });
 
-  useEffect(() => {
-    const fetchTask = async () => {
-      try {
-        const { id } = await params;
-        const data = await getTask(Number(id));
-        setTask(data);
-        reset({
-          title: data.title,
-          description: data.description || "",
-          due_date: data.due_date,
-          completed: data.completed,
-        });
-      } catch (error) {
-        console.error("Failed to load task:", error);
-        router.replace("/tasks");
-      }
-    };
-
-    fetchTask();
-  }, [params, reset, router]);
-
-  const handleTaskEdit = async (data: TaskCreateUpdate) => {
+  const handleTaskEdit = (data: TaskCreateUpdate) => {
     if (!task) return;
 
     const dueDate = new Date(data.due_date);
-    const utcDate = new Date(
+    data.due_date = new Date(
       Date.UTC(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())
     );
 
-    data.due_date = utcDate;
-
-    setIsLoading(true);
-    try {
-      await updateTask(task.id, data);
-      toast.success("Task updated successfully.");
-      router.replace("/tasks");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to update task.");
-    } finally {
-      setIsLoading(false);
-    }
+    updateTask.mutate(
+      {
+        taskId: task.id,
+        task: {
+          title: data.title,
+          description: data.description,
+          due_date: data.due_date,
+          completed: data.completed,
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.success("Task updated successfully.");
+          router.replace("/tasks");
+          reset();
+        },
+      }
+    );
   };
 
   const handleDelete = async () => {
     if (!task) return;
 
-    try {
-      await deleteTask(task.id);
-      toast.success("Task deleted successfully.");
-      router.replace("/tasks");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to delete task.");
-    }
+    deleteTask.mutate(task.id, {
+      onSuccess: () => {
+        toast.success("Task deleted successfully.");
+        router.replace("/tasks");
+        reset();
+      },
+    });
   };
+
+  useEffect(() => {
+    if (task) {
+      reset({
+        title: task.title,
+        description: task.description,
+        due_date: task.due_date,
+        completed: task.completed,
+      });
+    }
+  }, [task, reset]);
 
   if (!task) {
     return (

@@ -1,5 +1,4 @@
 import { Task } from "@/types/task";
-import { motion } from "framer-motion";
 import { Checkbox } from "../ui/checkbox";
 import { Badge } from "../ui/badge";
 import { Calendar } from "lucide-react";
@@ -18,12 +17,8 @@ export default function TaskCard({ task, onToggle, onClickTask }: Props) {
   const isOverdue = dueDateUTC < new Date();
 
   return (
-    <motion.div
+    <div
       key={task.id}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.3 }}
       className="bg-background border-muted group flex w-full flex-row gap-4 rounded-lg border p-4 shadow-md transition-colors hover:shadow-lg"
     >
       <div className="flex flex-col items-center justify-center">
@@ -60,6 +55,6 @@ export default function TaskCard({ task, onToggle, onClickTask }: Props) {
           </p>
         </Badge>
       </div>
-    </motion.div>
+    </div>
   );
 }

@@ -1,5 +1,4 @@
 import { ReactNode, useState } from "react";
-import { addTask } from "@/actions/todos";
 import {
   Dialog,
   DialogContent,
@@ -14,9 +13,9 @@ import { TaskCreateUpdate } from "@/types/task";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useAddTask } from "@/hooks";
 
 type Props = {
-  onTaskCreated?: (data?: TaskCreateUpdate) => void;
   children?: ReactNode;
 };
 const taskSchema = z.object({
@@ -28,9 +27,9 @@ const taskSchema = z.object({
 
 export type TaskCreate = z.infer<typeof taskSchema>;
 
-export default function CreateTask({ onTaskCreated, children }: Props) {
+export default function CreateTask({ children }: Props) {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const addTask = useAddTask();
 
   const {
     control,
@@ -48,6 +47,7 @@ export default function CreateTask({ onTaskCreated, children }: Props) {
   });
 
   const handleTaskSubmit = async (data: TaskCreateUpdate) => {
+    // Convert date to UTC (ensure consistency)
     const utcDate = new Date(
       Date.UTC(
         data.due_date.getFullYear(),
@@ -57,19 +57,10 @@ export default function CreateTask({ onTaskCreated, children }: Props) {
     );
     data.due_date = utcDate;
 
-    setIsLoading(true);
-
-    try {
-      await addTask(data);
-      setIsDialogOpen(false);
-      setIsLoading(false);
-      onTaskCreated?.();
-      reset();
-      toast.success("Task added successfully.");
-    } catch (error) {
-      console.error(error);
-      toast.error("An error occurred. Please try again later.");
-    }
+    addTask.mutate(data);
+    setIsDialogOpen(false);
+    reset();
+    toast.success("Task added successfully.");
   };
 
   return (
@@ -87,7 +78,6 @@ export default function CreateTask({ onTaskCreated, children }: Props) {
           handleSubmit={handleSubmit}
           errors={errors}
           onSubmit={handleTaskSubmit}
-          isLoading={isLoading}
         />
       </DialogContent>
     </Dialog>

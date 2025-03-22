@@ -39,7 +39,7 @@ export async function getTask(id: number): Promise<Task> {
   return data[0];
 }
 
-export async function addTask(task: TaskCreateUpdate): Promise<Task[]> {
+export async function addTask(task: TaskCreateUpdate): Promise<Task> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -49,7 +49,8 @@ export async function addTask(task: TaskCreateUpdate): Promise<Task[]> {
   const { data, error } = await supabase
     .from("tasks")
     .insert([{ ...task, user_id: user.id }])
-    .select();
+    .select()
+    .single();
 
   if (error) throw new Error(error.message);
 
@@ -67,10 +68,12 @@ export async function updateTask(
   } = await supabase.auth.getUser();
   if (!user) throw new Error("User not authenticated");
 
+  console.log(updates);
+
   const { data, error } = await supabase
     .from("tasks")
     .update(updates)
-    .match({ id, user_id: user.id }) // Ensure user owns the task
+    .match({ id, user_id: user.id })
     .select();
 
   if (error) throw new Error(error.message);
@@ -88,7 +91,7 @@ export async function deleteTask(id: number): Promise<{ success: boolean }> {
   const { error } = await supabase
     .from("tasks")
     .delete()
-    .match({ id, user_id: user.id }); // Ensure user owns the task
+    .match({ id, user_id: user.id });
 
   if (error) throw new Error(error.message);
 

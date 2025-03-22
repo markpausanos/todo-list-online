@@ -1,7 +1,7 @@
 "use client";
 
 import { logout } from "@/actions/users";
-import AuthProvider from "@/components/providers/auth-provider";
+import Providers from "@/components/providers/provider";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
@@ -25,7 +25,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthProvider>
+    <Providers>
       <div className="min-h-svh flex w-full flex-col items-center">
         <div className="flex w-full items-center justify-between px-6 py-4 md:px-20 lg:px-44">
           <h1 className="font-bold">Essence</h1>
@@ -63,6 +63,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </div>
-    </AuthProvider>
+    </Providers>
   );
 }

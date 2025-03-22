@@ -1,29 +1,27 @@
 "use client";
 
-import { getTasks, updateTask } from "@/actions/todos";
 import CreateTask from "@/components/todo/create-task";
 import { Button } from "@/components/ui/button";
 import { Task } from "@/types/task";
 import { Eye, EyeOff, FolderPlus, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
-import { AnimatePresence } from "framer-motion";
 import TaskCard from "@/components/todo/task-card";
-import { toast } from "sonner";
 import { usePathname, useRouter } from "next/navigation";
 import { useTaskStore } from "@/stores/task-store";
+import { useTasks } from "@/hooks";
+import useUpdateTask from "../../../hooks/tasks/useUpdateTask";
 
 export default function Page() {
   const router = useRouter();
   const pathName = usePathname();
+  const { data: tasks, isLoading } = useTasks();
+  const toggleTask = useUpdateTask();
+
   const { setShowOnlyIncomplete, showOnlyIncomplete, showOnlyToday } =
     useTaskStore();
 
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
   const today = new Date();
-  const filteredTasks = tasks.filter((task) => {
+  const filteredTasks = tasks?.filter((task) => {
     if (showOnlyIncomplete && task.completed) return false;
     if (showOnlyToday) {
       const taskDueDate = new Date(task.due_date);
@@ -36,48 +34,9 @@ export default function Page() {
     return true;
   });
 
-  const fetchTasks = async () => {
-    if (tasks.length === 0) setIsLoading(true);
-    try {
-      const data = await getTasks();
-      setTasks(data);
-    } catch (error) {
-      console.error("Failed to fetch tasks:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleToggle = async (task: Task) => {
-    try {
-      setTasks((prevTasks) =>
-        prevTasks.map((t) =>
-          t.id === task.id ? { ...t, completed: !task.completed } : t
-        )
-      );
-
-      await updateTask(task.id, { ...task, completed: !task.completed });
-      toast.success("Task completed status updated successfully.");
-    } catch (error) {
-      toast.error("An error occurred. Please try again later.");
-      console.error(error);
-
-      setTasks((prevTasks) =>
-        prevTasks.map((t) =>
-          t.id === task.id ? { ...t, completed: task.completed } : t
-        )
-      );
-    }
-  };
-
   const handleOnClickTask = (task: Task) => {
     router.push(`${pathName}/${task.id}`);
   };
-
-  useEffect(() => {
-    setIsLoading(true);
-    fetchTasks();
-  }, [showOnlyIncomplete, showOnlyToday]);
 
   return (
     <>
@@ -102,7 +61,7 @@ export default function Page() {
               {!showOnlyIncomplete ? "Hide" : "Show"} Completed
             </p>
           </Button>
-          <CreateTask onTaskCreated={fetchTasks}>
+          <CreateTask>
             <Button className="bg-primary text-white">
               <Plus />
               <p className="hidden md:block">New Task</p>
@@ -112,7 +71,7 @@ export default function Page() {
       </div>
       <div className="mt-8 flex w-full flex-col items-center justify-center">
         {isLoading ? <ClipLoader size={24} color="black" /> : null}
-        {!isLoading && filteredTasks.length === 0 && (
+        {!isLoading && filteredTasks?.length === 0 && (
           <div className="mt-8 flex flex-col items-center justify-center gap-4">
             <div className="bg-primary/10 rounded-full p-4">
               <FolderPlus size={48} className="text-muted-foreground" />
@@ -125,19 +84,23 @@ export default function Page() {
             </p>
           </div>
         )}
-        <AnimatePresence>
-          <div className="flex w-full flex-col gap-4 pb-10">
-            {!isLoading &&
-              filteredTasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  onToggle={handleToggle}
-                  onClickTask={handleOnClickTask}
-                />
-              ))}
-          </div>
-        </AnimatePresence>
+
+        <div className="flex w-full flex-col gap-4 pb-10">
+          {!isLoading &&
+            filteredTasks?.map((task) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                onToggle={() =>
+                  toggleTask.mutate({
+                    taskId: task.id,
+                    task: { ...task, completed: !task.completed },
+                  })
+                }
+                onClickTask={handleOnClickTask}
+              />
+            ))}
+        </div>
       </div>
     </>
   );
