@@ -23,15 +23,14 @@ const useDeleteTask = () => {
 
       return { previousTasks: queryClient.getQueryData<Task[]>(["tasks"]) };
     },
-
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
     onError: (_, __, context) => {
       if (context?.previousTasks) {
         queryClient.setQueryData(["tasks"], context.previousTasks);
         setTasks(context.previousTasks);
       }
-    },
-
-    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
