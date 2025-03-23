@@ -85,7 +85,7 @@ export default function TaskForm({
         <Button
           type="submit"
           disabled={isLoading}
-          className="bg-primary text-background"
+          className="bg-primary text-background cursor-pointer"
         >
           {submitText}
         </Button>
