@@ -31,6 +31,7 @@ const useAddTask = () => {
         setTasks(context.previousTasks);
       }
       toast.error(error.message);
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
