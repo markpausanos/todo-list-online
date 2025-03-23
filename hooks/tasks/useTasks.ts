@@ -3,15 +3,16 @@ import { getTasks } from "@/actions/todos";
 import { useTaskStore } from "@/stores/task-store";
 
 const useTasks = () => {
-  const { tasks, setTasks } = useTaskStore();
+  const { tasks, setTasks, isLoaded, setIsLoaded } = useTaskStore();
 
   return useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
-      if (tasks.length) return tasks;
+      if (isLoaded) return tasks;
 
       const fetchedTasks = await getTasks();
       setTasks(fetchedTasks);
+      setIsLoaded(true);
       return fetchedTasks;
     },
     staleTime: 1000 * 60 * 5,

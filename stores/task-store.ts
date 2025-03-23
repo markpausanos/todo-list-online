@@ -2,10 +2,12 @@ import { Task } from "@/types/task";
 import { create } from "zustand";
 
 type TaskStore = {
+  isLoaded: boolean;
   tasks: Task[];
-  setTasks: (tasks: Task[]) => void;
   showOnlyToday: boolean;
   showOnlyIncomplete: boolean;
+  setTasks: (tasks: Task[]) => void;
+  setIsLoaded: (isLoaded: boolean) => void;
   setShowOnlyToday: (showOnlyToday: boolean) => void;
   setShowOnlyIncomplete: (showOnlyIncomplete: boolean) => void;
 };
@@ -19,7 +21,12 @@ const loadLocalState = <T>(key: string, defaultValue: T): T => {
 };
 
 export const useTaskStore = create<TaskStore>((set) => ({
-  tasks: [],
+  isLoaded: loadLocalState("isLoaded", false),
+  setIsLoaded: (isLoaded) => {
+    localStorage.setItem("isLoaded", JSON.stringify(isLoaded));
+    set({ isLoaded });
+  },
+  tasks: loadLocalState("tasks", []),
   setTasks: (tasks) => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
     set({ tasks });

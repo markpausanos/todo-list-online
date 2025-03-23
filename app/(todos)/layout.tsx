@@ -11,7 +11,7 @@ import { CalendarCheck, LogOut, SquareCheckBig } from "lucide-react";
 import { useState } from "react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { showOnlyToday, setShowOnlyToday } = useTaskStore();
+  const { showOnlyToday, setShowOnlyToday, setIsLoaded } = useTaskStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignOut = async () => {
@@ -21,6 +21,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
+      setIsLoaded(false);
     }
   };
 

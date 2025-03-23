@@ -31,7 +31,7 @@ const useUpdateTask = () => {
         t.id === taskId ? { ...t, ...task } : t
       );
 
-      setTasks(updatedTasks);
+      setTasks([...updatedTasks]);
 
       queryClient.setQueryData(["tasks"], (oldTasks: Task[] = []) =>
         oldTasks.map((t) =>
@@ -47,7 +47,7 @@ const useUpdateTask = () => {
     onError: (_, __, context) => {
       if (context?.previousTasks) {
         queryClient.setQueryData(["tasks"], context.previousTasks);
-        setTasks(context.previousTasks);
+        setTasks([...context.previousTasks]);
       }
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },

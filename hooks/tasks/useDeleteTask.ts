@@ -29,7 +29,7 @@ const useDeleteTask = () => {
     onError: (_, __, context) => {
       if (context?.previousTasks) {
         queryClient.setQueryData(["tasks"], context.previousTasks);
-        setTasks(context.previousTasks);
+        setTasks([...context.previousTasks]);
       }
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },

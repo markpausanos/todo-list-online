@@ -28,7 +28,7 @@ const useAddTask = () => {
     onError: (error, __, context) => {
       if (context?.previousTasks) {
         queryClient.setQueryData(["tasks"], context.previousTasks);
-        setTasks(context.previousTasks);
+        setTasks([...context.previousTasks]);
       }
       toast.error(error.message);
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
@@ -43,7 +43,7 @@ const useAddTask = () => {
         task.id === context.optimisticTask.id ? savedTask : task
       );
 
-      setTasks(updatedTasks);
+      setTasks([...updatedTasks]);
 
       // Replace it in React Query cache
       queryClient.setQueryData<Task[]>(["tasks"], (oldTasks = []) =>
